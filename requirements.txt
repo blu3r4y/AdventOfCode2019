@@ -1,1 +1,3 @@
+advent-of-code-data>=0.8
+funcy>=1.13
 numpy>=1.17
