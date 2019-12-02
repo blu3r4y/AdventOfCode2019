@@ -7,6 +7,7 @@ My solutions for the [AoC 2019](https://adventofcode.com/2019) challenges, writt
 ## Challenges
 
 - :snake: **[Day 1: The Tyranny of the Rocket Equation](https://adventofcode.com/2019/day/1)** - [Python Solution](src/day1.py)
+- :snake: **[Day 2: 1202 Program Alarm](https://adventofcode.com/2019/day/2)** - [Python Solution](src/day2.py)
 
 ## Requirements
 
