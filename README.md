@@ -10,6 +10,7 @@ My solutions for the [AoC 2019](https://adventofcode.com/2019) challenges, writt
 - :snake: **[Day 2: 1202 Program Alarm](https://adventofcode.com/2019/day/2)** - [Python Solution](src/day2.py)
 - :snake: **[Day 3: Crossed Wires](https://adventofcode.com/2019/day/3)** - [Python Solution](src/day3.py)
 - :snake: **[Day 4: Secure Container](https://adventofcode.com/2019/day/4)** - [Python Solution](src/day4.py)
+- :snake: **[Day 5: Sunny with a Chance of Asteroids](https://adventofcode.com/2019/day/5)** - [Python Solution](src/day5.py)
 
 ## Requirements
 
