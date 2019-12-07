@@ -6,13 +6,13 @@ My solutions for the [AoC 2019](https://adventofcode.com/2019) challenges, writt
 
 ## Challenges
 
-- :snake: **[Day 1: The Tyranny of the Rocket Equation](https://adventofcode.com/2019/day/1)** - [Python Solution](src/day1.py)
-- :snake: **[Day 2: 1202 Program Alarm](https://adventofcode.com/2019/day/2)** - [Python Solution](src/day2.py)
-- :snake: **[Day 3: Crossed Wires](https://adventofcode.com/2019/day/3)** - [Python Solution](src/day3.py)
-- :snake: **[Day 4: Secure Container](https://adventofcode.com/2019/day/4)** - [Python Solution](src/day4.py)
-- :snake: **[Day 5: Sunny with a Chance of Asteroids](https://adventofcode.com/2019/day/5)** - [Python Solution](src/day5.py)
-- :snake: **[Day 6: Universal Orbit Map](https://adventofcode.com/2019/day/6)** - [Python Solution](src/day6.py)
-- :snake: **[Day 7: Amplification Circuit](https://adventofcode.com/2019/day/7)** - [Python Solution](src/day7.py)
+- **[Day 1: The Tyranny of the Rocket Equation](https://adventofcode.com/2019/day/1)** - [Python Solution](src/day1.py)
+- **[Day 2: 1202 Program Alarm](https://adventofcode.com/2019/day/2)** - [Python Solution](src/day2.py)
+- **[Day 3: Crossed Wires](https://adventofcode.com/2019/day/3)** - [Python Solution](src/day3.py)
+- **[Day 4: Secure Container](https://adventofcode.com/2019/day/4)** - [Python Solution](src/day4.py)
+- **[Day 5: Sunny with a Chance of Asteroids](https://adventofcode.com/2019/day/5)** - [Python Solution](src/day5.py)
+- **[Day 6: Universal Orbit Map](https://adventofcode.com/2019/day/6)** - [Python Solution](src/day6.py)
+- **[Day 7: Amplification Circuit](https://adventofcode.com/2019/day/7)** - [Python Solution](src/day7.py)
 
 ## Requirements
 
