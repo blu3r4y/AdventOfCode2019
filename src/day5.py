@@ -92,6 +92,10 @@ class HaltInstr(Instruction):
         pass  # nop
 
 
+class HaltInstrInteractive(HaltInstr):
+    pass
+
+
 class AddInstr(Instruction):
 
     @classmethod
@@ -218,40 +222,47 @@ class EqualsInstr(Instruction):
 
 class IntcodeMachine(object):
 
-    def __init__(self, memory: np.ndarray, system_id: int):
+    def __init__(self, memory: np.ndarray, inputs: List[int] = None):
         """
         Create a new IntCode virtual machine with a given program and data memory and a system id
 
         @param memory: Program and data memory
-        @param system_id: The system id will be returned if an input instruction is called
+        @param inputs: Input buffer for input instructions
         """
 
         self.memory = memory  # program and data memory
         self.ip = 0  # instruction pointer
-        self.buffer = []  # buffer for outputs
+        self.done = False  # are we finished yet?
+        self.inputs = inputs if inputs is not None else []  # input buffer
+        self.outputs = []  # output buffer
 
         # opcode to instruction mapping
         self._mapping = {
             Opcode.HALT: HaltInstr,
             Opcode.ADD: AddInstr,
             Opcode.MUL: MulInstr,
-            Opcode.INPUT: InputInstr.build_input_instruction(system_id),
-            Opcode.OUTPUT: OutputInstr.build_output_instruction(self.buffer),
+            Opcode.INPUT: None,  # created dynamically
+            Opcode.OUTPUT: OutputInstr.build_output_instruction(self.outputs),
             Opcode.JMP_TRUE: JmpTrueInstr,
             Opcode.JMP_FALSE: JmpFalseInstr,
             Opcode.LESS_THAN: LessThanInstr,
             Opcode.EQUALS: EqualsInstr
         }
 
-    def execute(self):
+    def execute(self, inputs: List[int] = None):
         """
         Interpret the instructions and finally return the last output value
+        @param inputs: Fill the input buffer with these values
         @return: The last value that was written by an output instruction
         """
+
+        if inputs is not None:
+            self.inputs.extend(inputs)
 
         while self.ip < len(self.memory):
             instr = self._parse_instruction()
             if isinstance(instr, HaltInstr):
+                self.done = type(instr) == HaltInstr  # we are only done on "real" halt instructions
                 break
 
             result = instr.apply()
@@ -259,7 +270,13 @@ class IntcodeMachine(object):
             # increase ip by instruction length by default - or set it to the instruction result
             self.ip = self.ip + instr.length() if result is None else result
 
-        return self.buffer[-1]
+        return self.get_output()
+
+    def get_output(self) -> int:
+        return self.outputs[-1] if len(self.outputs) > 0 else None
+
+    def set_input(self, value: int):
+        self.inputs.append(value)
 
     def _parse_instruction(self) -> Union[Instruction, None]:
         opcode = self.memory[self.ip]
@@ -267,24 +284,27 @@ class IntcodeMachine(object):
         if instrcode not in self._mapping:
             raise ValueError(f"unknown opcode {opcode} at ip = {self.ip}")
 
-        # grab correct instruction, and read number of parameters
-        cls = self._mapping[instrcode]
-        params = self.memory[self.ip + 1:self.ip + cls.length()].tolist()
-        # print(opcode, cls, params, cls.nparams())
+        # build input instructions dynamically or halt if no input is available
+        if instrcode == Opcode.INPUT:
+            cls = InputInstr.build_input_instruction(self.inputs.pop(0)) \
+                if len(self.inputs) > 0 else HaltInstrInteractive
+        else:
+            cls = self._mapping[instrcode]
 
         # initialize instruction
+        params = self.memory[self.ip + 1:self.ip + cls.length()].tolist()
         instr = cls(opcode, params, self.memory)
         return instr
 
 
 @print_calls
 def part1(ops):
-    return IntcodeMachine(ops, 1).execute()
+    return IntcodeMachine(ops, [1]).execute()
 
 
 @print_calls
 def part2(ops):
-    return IntcodeMachine(ops, 5).execute()
+    return IntcodeMachine(ops, [5]).execute()
 
 
 def load(data):
