@@ -1,7 +1,7 @@
 # Advent of Code 2019, Day 7
 # (c) blu3r4y
 
-from day5 import IntcodeMachine
+from intcode import IntcodeMachine
 
 from itertools import permutations
 
@@ -12,17 +12,17 @@ from funcy import print_calls
 
 
 def execute_series(ops, seq):
-    a = IntcodeMachine(ops, [seq[0], 0]).execute()
-    b = IntcodeMachine(ops, [seq[1], a]).execute()
-    c = IntcodeMachine(ops, [seq[2], b]).execute()
-    d = IntcodeMachine(ops, [seq[3], c]).execute()
-    e = IntcodeMachine(ops, [seq[4], d]).execute()
+    a = IntcodeMachine(ops.copy(), [seq[0], 0]).execute()
+    b = IntcodeMachine(ops.copy(), [seq[1], a]).execute()
+    c = IntcodeMachine(ops.copy(), [seq[2], b]).execute()
+    d = IntcodeMachine(ops.copy(), [seq[3], c]).execute()
+    e = IntcodeMachine(ops.copy(), [seq[4], d]).execute()
     return e
 
 
 def execute_loop(ops, seq):
     # create vms and initialize them with their sequence number
-    vms = [IntcodeMachine(ops) for _ in seq]
+    vms = [IntcodeMachine(ops.copy()) for _ in seq]
     for vm, sid in zip(vms, seq):
         assert vm.execute([sid]) is None
 
