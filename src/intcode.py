@@ -12,6 +12,7 @@ import numpy as np
 class Mode(IntEnum):
     POSITION = 0
     IMMEDIATE = 1
+    RELATIVE = 2
 
 
 class Opcode(IntEnum):
@@ -23,22 +24,25 @@ class Opcode(IntEnum):
     JMP_FALSE = 6
     LESS_THAN = 7
     EQUALS = 8
+    BASE_OFFSET = 9
     HALT = 99
 
 
 class Instruction(ABC):
 
-    def __init__(self, opcode: int, params: List[int], memory: np.ndarray):
+    def __init__(self, opcode: int, params: List[int], vm: "IntcodeMachine"):
         """
         Abstract base constructor for an instruction of the IntCode Machine
 
         @param opcode: The opcode along with its parameter mode specification
         @param params: The parameters for this opcode
-        @param memory: A reference to the program and data memory array
+        @param vm: Reference to the intcode machine
         """
         self.opcode, self.params = opcode, params
         self.instr = Opcode(self.opcode % 100)
-        self.memory = memory
+        self.vm = vm
+
+        self.memory = self.vm.memory
 
         # decode parameter modes
         self.modes = [0] * self.nparams()
@@ -47,13 +51,24 @@ class Instruction(ABC):
 
     def _get_params(self, nin: int, nout: int) -> Union[int, List[int]]:
         params = []
+
         for i in range(nin):
             # input parameters are either positional or immediate
-            params.append(int(self.memory[self.params[i]]) if self.modes[i] == Mode.POSITION else self.params[i])
+            if self.modes[i] == Mode.IMMEDIATE:
+                params.append(int(self.params[i]))
+            elif self.modes[i] == Mode.POSITION:
+                params.append(int(self.memory[self.params[i]]))
+            elif self.modes[i] == Mode.RELATIVE:
+                params.append(int(self.memory[self.vm.base + self.params[i]]))
+
         for i in range(nin, nin + nout):
             # output parameters are always memory addresses because they will be written
-            params.append(self.params[i])
+            if self.modes[i] == Mode.POSITION:
+                params.append(self.params[i])
+            elif self.modes[i] == Mode.RELATIVE:
+                params.append(self.vm.base + self.params[i])
 
+        assert len(params) == nin + nout
         return params if len(params) > 1 else params[0]  # return scalar or list
 
     @classmethod
@@ -118,8 +133,8 @@ class MulInstr(Instruction):
 
 class InputInstr(Instruction):
 
-    def __init__(self, opcode: int, params: List[int], memory: np.ndarray, value: int):
-        super().__init__(opcode, params, memory)
+    def __init__(self, opcode: int, params: List[int], vm: "IntcodeMachine", value: int):
+        super().__init__(opcode, params, vm)
         self.value = value
 
     @classmethod
@@ -146,8 +161,8 @@ class InputInstr(Instruction):
 
 class OutputInstr(Instruction):
 
-    def __init__(self, opcode: int, params: List[int], memory: np.ndarray, buffer: list):
-        super().__init__(opcode, params, memory)
+    def __init__(self, opcode: int, params: List[int], vm: "IntcodeMachine", buffer: list):
+        super().__init__(opcode, params, vm)
         self.buffer = buffer
 
     @classmethod
@@ -218,6 +233,17 @@ class EqualsInstr(Instruction):
         self.memory[c] = int(a == b)
 
 
+class BaseOffsetInstr(Instruction):
+
+    @classmethod
+    def length(cls) -> int:
+        return 2
+
+    def apply(self):
+        a = self._get_params(1, 0)
+        self.vm.base += a
+
+
 class IntcodeMachine(object):
 
     def __init__(self, memory: np.ndarray, inputs: List[int] = None):
@@ -230,9 +256,13 @@ class IntcodeMachine(object):
 
         self.memory = memory  # program and data memory
         self.ip = 0  # instruction pointer
+        self.base = 0  # relative base
         self.done = False  # are we finished yet?
         self.inputs = inputs if inputs is not None else []  # input buffer
         self.outputs = []  # output buffer
+
+        # increase memory size
+        self.memory = np.pad(self.memory, (0, int(1E4)), "constant")
 
         # opcode to instruction mapping
         self._mapping = {
@@ -244,7 +274,8 @@ class IntcodeMachine(object):
             Opcode.JMP_TRUE: JmpTrueInstr,
             Opcode.JMP_FALSE: JmpFalseInstr,
             Opcode.LESS_THAN: LessThanInstr,
-            Opcode.EQUALS: EqualsInstr
+            Opcode.EQUALS: EqualsInstr,
+            Opcode.BASE_OFFSET: BaseOffsetInstr
         }
 
     def execute(self, inputs: List[int] = None):
@@ -291,5 +322,5 @@ class IntcodeMachine(object):
 
         # initialize instruction
         params = self.memory[self.ip + 1:self.ip + cls.length()].tolist()
-        instr = cls(opcode, params, self.memory)
+        instr = cls(opcode, params, self)
         return instr
