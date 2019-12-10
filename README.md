@@ -15,6 +15,7 @@ My solutions for the [AoC 2019](https://adventofcode.com/2019) challenges, writt
 - **[Day 7: Amplification Circuit](https://adventofcode.com/2019/day/7)** - [Python Solution](src/day7.py)
 - **[Day 8: Space Image Format](https://adventofcode.com/2019/day/8)** - [Python Solution](src/day8.py)
 - **[Day 9: Sensor Boost](https://adventofcode.com/2019/day/9)** - [Python Solution](src/day9.py)
+- **[Day 10: Monitoring Station](https://adventofcode.com/2019/day/10)** - [Python Solution](src/day10.py)
 
 ## Requirements
 
