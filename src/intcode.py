@@ -33,7 +33,6 @@ class Instruction(ABC):
     def __init__(self, opcode: int, params: List[int], vm: "IntcodeMachine"):
         """
         Abstract base constructor for an instruction of the IntCode Machine
-
         @param opcode: The opcode along with its parameter mode specification
         @param params: The parameters for this opcode
         @param vm: Reference to the intcode machine
@@ -41,8 +40,6 @@ class Instruction(ABC):
         self.opcode, self.params = opcode, params
         self.instr = Opcode(self.opcode % 100)
         self.vm = vm
-
-        self.memory = self.vm.memory
 
         # decode parameter modes
         self.modes = [0] * self.nparams()
@@ -57,12 +54,14 @@ class Instruction(ABC):
             if self.modes[i] == Mode.IMMEDIATE:
                 params.append(int(self.params[i]))
             elif self.modes[i] == Mode.POSITION:
-                params.append(int(self.memory[self.params[i]]))
+                params.append(int(self.vm.memory[self.params[i]]))
             elif self.modes[i] == Mode.RELATIVE:
-                params.append(int(self.memory[self.vm.base + self.params[i]]))
+                params.append(int(self.vm.memory[self.vm.base + self.params[i]]))
 
         for i in range(nin, nin + nout):
             # output parameters are always memory addresses because they will be written
+            if self.modes[i] == Mode.IMMEDIATE:
+                raise ValueError(f"unsupported immediate mode for instruction {self.opcode} at ip = {self.vm.ip}")
             if self.modes[i] == Mode.POSITION:
                 params.append(self.params[i])
             elif self.modes[i] == Mode.RELATIVE:
@@ -90,7 +89,7 @@ class Instruction(ABC):
     def apply(self) -> int:
         """
         Perform the instruction
-        @return: Of not None, the return value will be the new instruction pointer
+        @return: Optional new instruction pointer if not None
         """
         pass
 
@@ -105,7 +104,10 @@ class HaltInstr(Instruction):
         pass  # nop
 
 
-class HaltInstrInteractive(HaltInstr):
+class HaltInstrInternal(HaltInstr):
+    """
+    Internal forced halt that is used to pause the execution
+    """
     pass
 
 
@@ -117,7 +119,7 @@ class AddInstr(Instruction):
 
     def apply(self):
         a, b, c = self._get_params(2, 1)
-        self.memory[c] = a + b
+        self.vm.memory[c] = a + b
 
 
 class MulInstr(Instruction):
@@ -128,7 +130,7 @@ class MulInstr(Instruction):
 
     def apply(self):
         a, b, c = self._get_params(2, 1)
-        self.memory[c] = a * b
+        self.vm.memory[c] = a * b
 
 
 class InputInstr(Instruction):
@@ -143,7 +145,7 @@ class InputInstr(Instruction):
 
     def apply(self):
         a = self._get_params(0, 1)
-        self.memory[a] = self.value
+        self.vm.memory[a] = self.value
 
     @staticmethod
     def build_input_instruction(value: int):
@@ -219,7 +221,7 @@ class LessThanInstr(Instruction):
 
     def apply(self):
         a, b, c = self._get_params(2, 1)
-        self.memory[c] = int(a < b)
+        self.vm.memory[c] = int(a < b)
 
 
 class EqualsInstr(Instruction):
@@ -230,7 +232,7 @@ class EqualsInstr(Instruction):
 
     def apply(self):
         a, b, c = self._get_params(2, 1)
-        self.memory[c] = int(a == b)
+        self.vm.memory[c] = int(a == b)
 
 
 class BaseOffsetInstr(Instruction):
@@ -246,15 +248,14 @@ class BaseOffsetInstr(Instruction):
 
 class IntcodeMachine(object):
 
-    def __init__(self, memory: np.ndarray, inputs: List[int] = None):
+    def __init__(self, memory: Union[np.ndarray, str], inputs: List[int] = None):
         """
         Create a new IntCode virtual machine with a given program and data memory and an optional input buffer
-
         @param memory: Program and data memory
         @param inputs: Input buffer for input instructions
         """
 
-        self.memory = memory  # program and data memory
+        self.memory = memory if isinstance(memory, np.ndarray) else self.parse_memory(memory)  # program and data
         self.ip = 0  # instruction pointer
         self.base = 0  # relative base
         self.done = False  # are we finished yet?
@@ -278,10 +279,11 @@ class IntcodeMachine(object):
             Opcode.BASE_OFFSET: BaseOffsetInstr
         }
 
-    def execute(self, inputs: List[int] = None):
+    def execute(self, inputs: List[int] = None, nopause=False) -> int:
         """
         Interpret the instructions and finally return the last output value
         @param inputs: Fill the input buffer with these values
+        @param nopause: Avoid forced halts due to missing inputs
         @return: The last value that was written by an output instruction
         """
 
@@ -299,15 +301,21 @@ class IntcodeMachine(object):
             # increase ip by instruction length by default - or set it to the instruction result
             self.ip = self.ip + instr.length() if result is None else result
 
+        if nopause and not self.done:
+            raise RuntimeError(f"vm execution stopped at ip = {self.ip} because the input buffer was empty")
+
         return self.get_output()
 
-    def get_output(self) -> int:
-        return self.outputs[-1] if len(self.outputs) > 0 else None
+    def get_output(self, n=1) -> Union[None, int, List[int]]:
+        """
+        Retrieve the last n (default: 1) output values
+        @param n: Number of outputs to retrieve (default: 1)
+        """
+        if len(self.outputs) == 0:
+            return None
+        return self.outputs[-n:] if n > 1 else self.outputs[-1]
 
-    def set_input(self, value: int):
-        self.inputs.append(value)
-
-    def _parse_instruction(self) -> Union[Instruction, None]:
+    def _parse_instruction(self) -> Instruction:
         opcode = self.memory[self.ip]
         instrcode = opcode % 100
         if instrcode not in self._mapping:
@@ -316,7 +324,7 @@ class IntcodeMachine(object):
         # build input instructions dynamically or halt if no input is available
         if instrcode == Opcode.INPUT:
             cls = InputInstr.build_input_instruction(self.inputs.pop(0)) \
-                if len(self.inputs) > 0 else HaltInstrInteractive
+                if len(self.inputs) > 0 else HaltInstrInternal
         else:
             cls = self._mapping[instrcode]
 
@@ -324,3 +332,12 @@ class IntcodeMachine(object):
         params = self.memory[self.ip + 1:self.ip + cls.length()].tolist()
         instr = cls(opcode, params, self)
         return instr
+
+    @staticmethod
+    def parse_memory(text: str) -> np.ndarray:
+        """
+        Parse a program from its string representation
+        @param text: A comma-separated list of memory values
+        @return: A memory array
+        """
+        return np.array(list(map(int, text.split(","))), dtype=np.int64)
