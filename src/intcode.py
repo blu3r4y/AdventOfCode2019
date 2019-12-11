@@ -311,7 +311,7 @@ class IntcodeMachine(object):
         Retrieve the last n (default: 1) output values
         @param n: Number of outputs to retrieve (default: 1)
         """
-        if len(self.outputs) == 0:
+        if len(self.outputs) < n:
             return None
         return self.outputs[-n:] if n > 1 else self.outputs[-1]
 
