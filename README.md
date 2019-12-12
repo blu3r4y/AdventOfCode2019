@@ -17,6 +17,7 @@ My solutions for the [AoC 2019](https://adventofcode.com/2019) challenges, writt
 - **[Day 9: Sensor Boost](https://adventofcode.com/2019/day/9)** - [Python Solution](src/day9.py)
 - **[Day 10: Monitoring Station](https://adventofcode.com/2019/day/10)** - [Python Solution](src/day10.py)
 - **[Day 11: Space Police](https://adventofcode.com/2019/day/11)** - [Python Solution](src/day11.py)
+- **[Day 12: The N-Body Problem](https://adventofcode.com/2019/day/12)** - [Python Solution](src/day12.py)
 
 ## Requirements
 
