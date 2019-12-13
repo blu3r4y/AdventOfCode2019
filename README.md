@@ -18,6 +18,7 @@ My solutions for the [AoC 2019](https://adventofcode.com/2019) challenges, writt
 - **[Day 10: Monitoring Station](https://adventofcode.com/2019/day/10)** - [Python Solution](src/day10.py)
 - **[Day 11: Space Police](https://adventofcode.com/2019/day/11)** - [Python Solution](src/day11.py)
 - **[Day 12: The N-Body Problem](https://adventofcode.com/2019/day/12)** - [Python Solution](src/day12.py)
+- **[Day 13: Care Package](https://adventofcode.com/2019/day/13)** - [Python Solution](src/day13.py)
 
 ## Requirements
 

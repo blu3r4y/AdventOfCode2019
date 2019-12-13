@@ -1,12 +1,11 @@
 # Advent of Code 2019, Day 11
 # (c) blu3r4y
 
-import matplotlib.pyplot as plt
-import numpy as np
 from aocd.models import Puzzle
 from funcy import print_calls
 
 from intcode import IntcodeMachine
+from util import coordinates_to_grid
 
 BLACK, WHITE = 0, 1
 
@@ -39,20 +38,7 @@ def part1(program):
 @print_calls
 def part2(program):
     panels = painting_robot(program, start=WHITE)
-    panels = {(int(pos.real), int(pos.imag)): color for pos, color in panels.items()}  # complex to int tuples
-
-    # retrieve bounds and initialite empty grid
-    coords = np.array(list(panels.keys()))
-    (xmin, ymin), (xmax, ymax) = np.amin(coords, axis=0), np.amax(coords, axis=0)
-    grid = np.zeros((xmax - xmin + 1, ymax - ymin + 1))
-
-    # paint grid cells
-    for (x, y), color in panels.items():
-        grid[x - xmin, y - ymin] = color
-
-    # plot grid
-    plt.imshow(np.rot90(grid))
-    plt.show()
+    coordinates_to_grid(panels, plot=True, rotate=1)
 
 
 if __name__ == "__main__":

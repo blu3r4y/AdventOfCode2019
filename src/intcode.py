@@ -306,14 +306,23 @@ class IntcodeMachine(object):
 
         return self.get_output()
 
-    def get_output(self, n=1) -> Union[None, int, List[int]]:
+    def get_output(self, n=1, pop=False) -> Union[None, int, List[int]]:
         """
         Retrieve the last n (default: 1) output values
-        @param n: Number of outputs to retrieve (default: 1)
+        @param n: Number of outputs to retrieve (default: 1), use None to retrieve the full output
+        @param pop: Remove the output values after retrieval (default: False)
         """
-        if len(self.outputs) < n:
+        if n is None:
+            n = len(self.outputs)
+        if n == 0 or len(self.outputs) < n:
             return None
-        return self.outputs[-n:] if n > 1 else self.outputs[-1]
+
+        view = self.outputs[-n:] if n > 1 else self.outputs[-1]
+
+        if pop:
+            del self.outputs[-n:]
+
+        return view
 
     def _parse_instruction(self) -> Instruction:
         opcode = self.memory[self.ip]
