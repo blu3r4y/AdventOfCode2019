@@ -21,6 +21,7 @@ My solutions for the [AoC 2019](https://adventofcode.com/2019) challenges, writt
 - **[Day 13: Care Package](https://adventofcode.com/2019/day/13)** - [Python Solution](src/day13.py)
 - **[Day 14: Space Stoichiometry](https://adventofcode.com/2019/day/14)** - [Python Solution](src/day14.py)
 - **[Day 15: Oxygen System](https://adventofcode.com/2019/day/15)** - [Python Solution](src/day15.py)
+- **[Day 16: Flawed Frequency Transmission](https://adventofcode.com/2019/day/16)** - [Python Solution](src/day16.py)
 
 ## Requirements
 
