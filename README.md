@@ -19,7 +19,7 @@ My solutions for the [AoC 2019](https://adventofcode.com/2019) challenges, writt
 - **[Day 11: Space Police](https://adventofcode.com/2019/day/11)** - [Python Solution](src/day11.py)
 - **[Day 12: The N-Body Problem](https://adventofcode.com/2019/day/12)** - [Python Solution](src/day12.py)
 - **[Day 13: Care Package](https://adventofcode.com/2019/day/13)** - [Python Solution](src/day13.py)
-- **[Day 14: Space Stoichiometry](https://adventofcode.com/2019/day/14)**
+- **[Day 14: Space Stoichiometry](https://adventofcode.com/2019/day/14)** - [Python Solution](src/day14.py)
 - **[Day 15: Oxygen System](https://adventofcode.com/2019/day/15)** - [Python Solution](src/day15.py)
 
 ## Requirements
