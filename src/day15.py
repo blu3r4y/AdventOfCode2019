@@ -5,12 +5,11 @@ from collections import defaultdict
 from random import choice
 
 import matplotlib.pyplot as plt
-import numpy as np
 from aocd.models import Puzzle
 from funcy import print_calls
 
 from intcode import IntcodeMachine
-from util import coordinates_to_grid
+from util import coordinates_to_grid, init_interactive_plot
 
 NORTH, SOUTH, WEST, EAST = 1, 2, 3, 4
 WALL, EMPTY, GOAL, OXYGEN = 0, 1, 2, 2
@@ -32,12 +31,7 @@ class TremauxMethod(object):
         self.face = 1j
         self.goal = None
 
-        self.view = None
-        if visualize:
-            plt.ion()
-            plt.figure()
-            plt.axis("off")
-            self.view = plt.imshow(np.ones((50, 50, 3)))
+        self.view = init_interactive_plot() if visualize else None
 
     def escape(self, scanmode=False):
         # the starting point needs to be valid
@@ -201,7 +195,7 @@ class TremauxMethod(object):
 @print_calls
 def part1(program):
     robot = IntcodeMachine(program)
-    solver = TremauxMethod(robot, visualize=False)
+    solver = TremauxMethod(robot, visualize=True)
 
     oxygen = solver.escape()
     return solver.shortest_path_length(0, oxygen)

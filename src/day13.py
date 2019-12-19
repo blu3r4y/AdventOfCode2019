@@ -3,23 +3,14 @@
 from typing import Tuple, Dict
 
 import matplotlib.pyplot as plt
-import numpy as np
 from aocd.models import Puzzle
 from funcy import print_calls
 from more_itertools import chunked
 
 from intcode import IntcodeMachine
-from util import coordinates_to_grid
+from util import coordinates_to_grid, init_interactive_plot
 
 EMPTY, WALL, BLOCK, PADDLE, BALL = 0, 1, 2, 3, 4
-
-
-def init_interactive_plot():
-    # prepare an empty image grid that can be changed dynamically
-    plt.ion()
-    plt.figure()
-    view = plt.imshow(np.ones((25, 50, 3)))
-    return view
 
 
 def plot_tiles(tiles, view):

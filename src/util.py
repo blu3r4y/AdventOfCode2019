@@ -34,3 +34,12 @@ def coordinates_to_grid(coordinates: Union[Dict[Tuple[int, int], int], Dict[comp
         plt.show()
 
     return grid
+
+
+def init_interactive_plot():
+    plt.ion()
+    plt.figure(figsize=(10, 10))
+    plt.axis("off")
+
+    view = plt.imshow(np.ones((10, 10)))
+    return view
