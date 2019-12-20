@@ -1,5 +1,4 @@
 advent-of-code-data>=0.8
-more_itertools>=8.0
 matplotlib>=3.1
 networkx>=2.4
 funcy>=1.13

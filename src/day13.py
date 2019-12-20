@@ -4,8 +4,7 @@ from typing import Tuple, Dict
 
 import matplotlib.pyplot as plt
 from aocd.models import Puzzle
-from funcy import print_calls
-from more_itertools import chunked
+from funcy import print_calls, chunks
 
 from intcode import IntcodeMachine
 from util import coordinates_to_grid, init_interactive_plot
@@ -25,7 +24,7 @@ def plot_tiles(tiles, view):
 
 def read_tiles(robot, tiles=None) -> Tuple[Dict[Tuple[int, int], int], int]:
     tiles, score = {} if not tiles else tiles, 0
-    for x, y, tile in chunked(robot.get_output(None, pop=True), 3):
+    for x, y, tile in chunks(3, robot.get_output(None, pop=True)):
         if x == -1 and y == 0:
             score = tile  # special score tile
         else:
