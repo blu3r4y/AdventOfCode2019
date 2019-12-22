@@ -21,9 +21,7 @@ def get_complex_grid(robot, flip):
     robot.execute()
     field = "".join(map(chr, robot.get_output(None, pop=True)[:-2]))  # :-2 to remove double line breaks at end
     field = array_to_dict(text_to_array(field, flip=flip), ignore_values=[FREE])
-    cg = ComplexGrid(field)
-    cg.plot()
-    return cg
+    return ComplexGrid(field)
 
 
 def get_intersections(cg: ComplexGrid):
