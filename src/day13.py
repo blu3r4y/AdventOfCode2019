@@ -6,14 +6,15 @@ import matplotlib.pyplot as plt
 from aocd.models import Puzzle
 from funcy import print_calls, chunks
 
+from gridtools import dict_to_array
 from intcode import IntcodeMachine
-from util import coordinates_to_grid, init_interactive_plot
+from util import init_interactive_plot
 
 EMPTY, WALL, BLOCK, PADDLE, BALL = 0, 1, 2, 3, 4
 
 
 def plot_tiles(tiles, view):
-    grid = coordinates_to_grid(tiles)
+    grid = dict_to_array(tiles)
 
     view.set_data(grid.T)  # reset grid content
     view.set_clim(vmin=0, vmax=4)  # reset value range

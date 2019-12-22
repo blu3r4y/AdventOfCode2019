@@ -1,11 +1,13 @@
 # Advent of Code 2019, Day 11
 # (c) blu3r4y
 
+import matplotlib.pyplot as plt
+import numpy as np
 from aocd.models import Puzzle
 from funcy import print_calls
 
+from gridtools import dict_to_array
 from intcode import IntcodeMachine
-from util import coordinates_to_grid
 
 BLACK, WHITE = 0, 1
 
@@ -38,7 +40,9 @@ def part1(program):
 @print_calls
 def part2(program):
     panels = painting_robot(program, start=WHITE)
-    coordinates_to_grid(panels, plot=True, rotate=1)
+    arr = dict_to_array(panels)
+    plt.imshow(np.rot90(arr))
+    plt.show()
 
 
 if __name__ == "__main__":

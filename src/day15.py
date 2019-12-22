@@ -8,8 +8,9 @@ import matplotlib.pyplot as plt
 from aocd.models import Puzzle
 from funcy import print_calls
 
+from gridtools import dict_to_array
 from intcode import IntcodeMachine
-from util import coordinates_to_grid, init_interactive_plot
+from util import init_interactive_plot
 
 NORTH, SOUTH, WEST, EAST = 1, 2, 3, 4
 WALL, EMPTY, GOAL, OXYGEN = 0, 1, 2, 2
@@ -183,7 +184,7 @@ class TremauxMethod(object):
         grid = self.grid.copy()
         grid[self.pos] = 4
         grid[self.start] = 5
-        grid = coordinates_to_grid(grid)
+        grid = dict_to_array(grid)
 
         self.view.set_data(grid.T)  # reset grid content
         self.view.set_clim(vmin=0, vmax=5)  # reset value range
@@ -204,7 +205,7 @@ def part1(program):
 @print_calls
 def part2(program):
     robot = IntcodeMachine(program)
-    solver = TremauxMethod(robot, visualize=False)
+    solver = TremauxMethod(robot, visualize=True)
 
     solver.escape(scanmode=True)
     return solver.fill_oxygen()
