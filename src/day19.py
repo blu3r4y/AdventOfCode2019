@@ -3,10 +3,8 @@
 
 from bisect import bisect_left
 from collections import defaultdict
-from functools import lru_cache
 from itertools import product
 from math import ceil, log
-from typing import Sequence
 
 import matplotlib.pyplot as plt
 from aocd.models import Puzzle
@@ -15,6 +13,7 @@ from funcy import print_calls, first
 from gridtools import dict_to_array, complex_to_tuple, tuple_to_complex
 from intcode import IntcodeMachine
 from util import init_interactive_plot
+from lazysequence import LazySequence
 
 FREE, BEAM = 0, 1
 
@@ -38,7 +37,7 @@ class TractorBeam(object):
     def map(self, size, until_fit=None):
         # efficiently map the entire beam up to a square of the requested size
         for ndia, dia in enumerate(zigzag(size)):
-            seq = LazySeq(lambda i: self.move(tuple_to_complex(dia[i])) == BEAM, len(dia))
+            seq = LazySequence(lambda i: self.move(tuple_to_complex(dia[i])) == BEAM, len(dia))
             bounds = fast_bounds(seq, 0, len(dia))
 
             # fill entire range
@@ -69,35 +68,6 @@ class TractorBeam(object):
 
         plt.draw()
         plt.pause(.001)
-
-
-class LazySeq(Sequence):
-
-    @lru_cache(maxsize=None)
-    def _get(self, i):
-        return self.getter(i)
-
-    def _idx(self, i):
-        return i if not self.reverse else self.size - 1 - i
-
-    def __getitem__(self, key):
-        if isinstance(key, slice):
-            return [self._get(self._idx(i)) for i in range(*key.indices(self.size))]
-        elif key < 0:
-            return self._get(self._idx(self.size + key))
-        return self._get(self._idx(key))
-
-    def __len__(self):
-        return self.size
-
-    def __reversed__(self):
-        self.reverse = not self.reverse
-        return self
-
-    def __init__(self, getter, size, reverse=False):
-        self.getter = getter
-        self.size = size
-        self.reverse = reverse
 
 
 def zigzag(size):
