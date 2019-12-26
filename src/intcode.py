@@ -4,7 +4,7 @@
 from abc import ABC, abstractmethod
 from enum import IntEnum
 from functools import partialmethod
-from typing import List, Union
+from typing import List, Union, Sequence
 
 import numpy as np
 
@@ -264,6 +264,8 @@ class IntcodeMachine(object):
 
         # increase memory size
         self.memory = np.pad(self.memory, (0, int(1E4)), "constant")
+        self._backup = self.memory.copy()
+        self._backup.flags.writeable = False
 
         # opcode to instruction mapping
         self._mapping = {
@@ -279,11 +281,25 @@ class IntcodeMachine(object):
             Opcode.BASE_OFFSET: BaseOffsetInstr
         }
 
-    def execute(self, inputs: List[int] = None, nopause=False) -> int:
+    def reset(self):
+        """
+        Reset the entire IntCode virtual machine to its original state and clear all buffers
+        """
+        self.ip = 0
+        self.base = 0
+        self.done = False
+        self.inputs = []
+        self.outputs = []
+        self.memory = self._backup.copy()
+        self._mapping[Opcode.OUTPUT] = OutputInstr.build_output_instruction(self.outputs)
+
+    def execute(self, inputs: Sequence[int] = None, nopause=False, noutputs=1, pop=False) -> int:
         """
         Interpret the instructions and finally return the last output value
         @param inputs: Fill the input buffer with these values
         @param nopause: Avoid forced halts due to missing inputs
+        @param noutputs: After the execution stopped, retrieve the last noutputs (default: 1) output values
+        @param pop: When returning the last output value, also pop the value from the buffer
         @return: The last value that was written by an output instruction
         """
 
@@ -304,7 +320,7 @@ class IntcodeMachine(object):
         if nopause and not self.done:
             raise RuntimeError(f"vm execution stopped at ip = {self.ip} because the input buffer was empty")
 
-        return self.get_output()
+        return self.get_output(n=noutputs, pop=pop)
 
     def get_output(self, n=1, pop=False) -> Union[None, int, List[int]]:
         """

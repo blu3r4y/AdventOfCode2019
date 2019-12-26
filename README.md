@@ -23,6 +23,8 @@ My solutions for the [AoC 2019](https://adventofcode.com/2019) challenges, writt
 - **[Day 15: Oxygen System](https://adventofcode.com/2019/day/15)** - [Python Solution](src/day15.py)
 - **[Day 16: Flawed Frequency Transmission](https://adventofcode.com/2019/day/16)** - [Python Solution](src/day16.py)
 - **[Day 17: Set And Forget](https://adventofcode.com/2019/day/17)** - [Python Solution](src/day17.py)
+- **[Day 18: Many-Worlds Interpretation](https://adventofcode.com/2019/day/18)**
+- **[Day 19: Tractor Beam](https://adventofcode.com/2019/day/19)** - [Python Solution](src/day19.py)
 
 ## Requirements
 
